@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // --- 무설치 자체 아이콘 ---
 const IconMessageCircle = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>;
@@ -106,6 +106,7 @@ const Step2_Intro = () => (
     <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 leading-snug">
       예배시의 음악사용과 문화에 대하여
     </h2>
+    <p className="text-gray-500 text-sm">원문 - 이정규 목사 (시광교회)</p>
     
     <p className="text-gray-700 leading-relaxed mt-4">
       교회 안에서 음악은 무척 예민한 문제야. 성도들이 쉽게 화를 내거나 상처 받기도 하거든. 스펄전 목사님은 그의 음악 사역을 ‘전쟁 부서’라고 불렀어. 미국의 기독교 작가 제임스 답슨(James Dobson)은 음악이 교회에 많은 분쟁을 가져왔다면서 이렇게 덧붙였어. 
@@ -280,7 +281,7 @@ const Step7_Questions = () => {
   ];
 
   return (
-    <div className="space-y-5 pb-10">
+    <div className="space-y-5 pb-20">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xl">📚</span>
         <h2 className="text-xl font-bold text-gray-900">나눔 질문</h2>
@@ -301,6 +302,15 @@ const Step7_Questions = () => {
           </AccordionItem>
         ))}
       </div>
+      
+      <div className="pt-10 flex justify-center">
+        <button
+          onClick={() => window.alert('수고하셨습니다! 풍성한 나눔 시간 되세요. 🙏')}
+          className="flex items-center gap-1 px-6 py-3 rounded-xl font-semibold text-white bg-gray-800 hover:bg-gray-900 transition-colors shadow-lg"
+        >
+          나눔 완료하기
+        </button>
+      </div>
     </div>
   );
 };
@@ -310,12 +320,11 @@ const Step7_Questions = () => {
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
   
-  // 스와이프 처리를 위한 상태 저장
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
-  
-  // 스와이프로 인식할 최소 이동 거리(px)
-  const minSwipeDistance = 50;
+  // 실시간 스와이프 상태 관리
+  const [touchStart, setTouchStart] = useState<{x: number, y: number} | null>(null);
+  const [swipeOffset, setSwipeOffset] = useState<number>(0);
+  const [isSwiping, setIsSwiping] = useState<boolean>(false);
+  const [swipeAxis, setSwipeAxis] = useState<'x' | 'y' | null>(null);
 
   const steps = [
     <Step0_Title />,
@@ -329,44 +338,86 @@ function App() {
   ];
 
   const totalSteps = steps.length;
+  const minSwipeDistance = 60; // 이 이상 밀어야 페이지가 넘어감
+
+  // 페이지 이동 시 해당 페이지의 스크롤을 맨 위로 초기화
+  useEffect(() => {
+    const el = document.getElementById(`step-container-${currentStep}`);
+    if (el) el.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentStep]);
 
   const onTouchStartEvent = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
+    setTouchStart({
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY
+    });
+    setIsSwiping(true);
+    setSwipeAxis(null);
   };
 
   const onTouchMoveEvent = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    if (!touchStart) return;
+    
+    const currentX = e.targetTouches[0].clientX;
+    const currentY = e.targetTouches[0].clientY;
+    const diffX = currentX - touchStart.x;
+    const diffY = currentY - touchStart.y;
+
+    let currentAxis = swipeAxis;
+    
+    // 처음에 사용자가 상하로 스크롤하려는지, 좌우로 스와이프하려는지 파악
+    if (!currentAxis && (Math.abs(diffX) > 5 || Math.abs(diffY) > 5)) {
+      currentAxis = Math.abs(diffX) > Math.abs(diffY) ? 'x' : 'y';
+      setSwipeAxis(currentAxis);
+    }
+
+    // 세로 스크롤 중이라면 좌우 애니메이션 무시
+    if (currentAxis === 'y') return;
+    
+    // 가로 스와이프 중이라면 실시간 위치 업데이트
+    if (currentAxis === 'x') {
+      // 첫 페이지에서 더 왼쪽으로 밀거나, 끝 페이지에서 더 오른쪽으로 밀 때의 저항감(고무줄 효과)
+      if ((currentStep === 0 && diffX > 0) || (currentStep === totalSteps - 1 && diffX < 0)) {
+        setSwipeOffset(diffX * 0.25);
+      } else {
+        setSwipeOffset(diffX);
+      }
+    }
   };
 
   const onTouchEndEvent = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe && currentStep < totalSteps - 1) {
-      // 왼쪽으로 스와이프 (다음 화면)
-      setCurrentStep(prev => prev + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else if (isRightSwipe && currentStep > 0) {
-      // 오른쪽으로 스와이프 (이전 화면)
-      setCurrentStep(prev => prev - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsSwiping(false);
+    
+    if (swipeAxis === 'x') {
+      // 지정된 거리 이상 밀었으면 페이지 전환
+      if (swipeOffset < -minSwipeDistance && currentStep < totalSteps - 1) {
+        setCurrentStep(prev => prev + 1);
+      } else if (swipeOffset > minSwipeDistance && currentStep > 0) {
+        setCurrentStep(prev => prev - 1);
+      }
     }
+    
+    // 터치 종료 시 변수 초기화 (스르륵 제자리로 돌아감)
+    setSwipeOffset(0);
+    setTouchStart(null);
+    setSwipeAxis(null);
   };
 
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center text-gray-900 font-sans">
+      {/* 
+        touch-pan-y 클래스: 스마트폰 브라우저의 기본 뒤로가기 스와이프는 막고, 
+        상하 스크롤만 부드럽게 허용해주는 핵심 설정!
+      */}
       <div 
-        className="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col relative overflow-hidden"
+        className="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col relative overflow-hidden touch-pan-y"
         onTouchStart={onTouchStartEvent}
         onTouchMove={onTouchMoveEvent}
         onTouchEnd={onTouchEndEvent}
       >
         
         {/* 상단 8개의 동그라미 인디케이터 */}
-        <div className="flex justify-center items-center gap-2 pt-6 pb-2 sticky top-0 z-50 bg-white/90 backdrop-blur-sm">
+        <div className="flex justify-center items-center gap-2 pt-6 pb-4 sticky top-0 z-50 bg-white/90 backdrop-blur-sm">
           {Array.from({ length: totalSteps }).map((_, idx) => (
             <div
               key={idx}
@@ -377,10 +428,28 @@ function App() {
           ))}
         </div>
 
-        {/* 본문 콘텐츠 */}
-        <main className="flex-1 px-6 py-6 overflow-x-hidden animate-in fade-in duration-300">
-          {steps[currentStep]}
-        </main>
+        {/* 좌우로 슬라이드 되는 전체 컨테이너 */}
+        <div className="flex-1 relative overflow-hidden">
+          <div 
+            className="flex w-full h-full"
+            style={{
+              transform: `translateX(calc(-${currentStep * 100}% + ${swipeOffset}px))`,
+              // 터치 중(isSwiping)일 때는 애니메이션을 꺼서 손가락을 1:1로 따라가고, 
+              // 손을 떼면 부드럽게(cubic-bezier) 제자리나 다음 페이지로 튕기듯 들어가는 원리
+              transition: isSwiping ? 'none' : 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)'
+            }}
+          >
+            {steps.map((step, idx) => (
+              <div 
+                key={idx} 
+                id={`step-container-${idx}`}
+                className="w-full h-full flex-shrink-0 overflow-y-auto px-6 py-4 pb-24"
+              >
+                {step}
+              </div>
+            ))}
+          </div>
+        </div>
 
       </div>
     </div>
