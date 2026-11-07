@@ -1,12 +1,10 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-// --- 무설치 자체 아이콘 (lucide-react 대체) ---
+// --- 무설치 자체 아이콘 ---
 const IconMessageCircle = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>;
 const IconChevronDown = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m6 9 6 6 6-6"/></svg>;
 const IconChevronUp = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m18 15-6-6-6 6"/></svg>;
-const IconChevronLeft = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15 18-6-6 6-6"/></svg>;
-const IconChevronRight = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>;
 
 // --- Reusable UI Components ---
 const Blockquote = ({ text, author }: { text: string; author?: string }) => (
@@ -51,7 +49,7 @@ const Step0_Title = () => (
     <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 leading-snug">
       찬양을 어떻게 부르고<br/>연주해야 할까?
     </h1>
-    <p className="text-gray-500">화면을 넘겨 나눔을 시작해보세요!</p>
+    <p className="text-gray-500 font-medium animate-pulse">화면을 왼쪽으로 스와이프해서<br/>나눔을 시작해보세요! 👈</p>
     
     <div className="mt-12 text-xs text-gray-400 space-y-1">
       <p>원문 - 이정규 목사: 시광교회의 예배음악</p>
@@ -108,7 +106,6 @@ const Step2_Intro = () => (
     <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 leading-snug">
       예배시의 음악사용과 문화에 대하여
     </h2>
-    <p className="text-gray-500 text-sm">원문 - 이정규 목사 (시광교회)</p>
     
     <p className="text-gray-700 leading-relaxed mt-4">
       교회 안에서 음악은 무척 예민한 문제야. 성도들이 쉽게 화를 내거나 상처 받기도 하거든. 스펄전 목사님은 그의 음악 사역을 ‘전쟁 부서’라고 불렀어. 미국의 기독교 작가 제임스 답슨(James Dobson)은 음악이 교회에 많은 분쟁을 가져왔다면서 이렇게 덧붙였어. 
@@ -312,6 +309,13 @@ const Step7_Questions = () => {
 
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
+  
+  // 스와이프 처리를 위한 상태 저장
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  
+  // 스와이프로 인식할 최소 이동 거리(px)
+  const minSwipeDistance = 50;
 
   const steps = [
     <Step0_Title />,
@@ -326,64 +330,57 @@ function App() {
 
   const totalSteps = steps.length;
 
-  const handleNext = () => {
-    if (currentStep < totalSteps - 1) setCurrentStep(prev => prev + 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const onTouchStartEvent = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
   };
 
-  const handlePrev = () => {
-    if (currentStep > 0) setCurrentStep(prev => prev - 1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const onTouchMoveEvent = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
   };
 
-  const progress = ((currentStep + 1) / totalSteps) * 100;
+  const onTouchEndEvent = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && currentStep < totalSteps - 1) {
+      // 왼쪽으로 스와이프 (다음 화면)
+      setCurrentStep(prev => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (isRightSwipe && currentStep > 0) {
+      // 오른쪽으로 스와이프 (이전 화면)
+      setCurrentStep(prev => prev - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center text-gray-900 font-sans">
-      <div className="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col relative">
+      <div 
+        className="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col relative overflow-hidden"
+        onTouchStart={onTouchStartEvent}
+        onTouchMove={onTouchMoveEvent}
+        onTouchEnd={onTouchEndEvent}
+      >
         
-        <div className="h-1.5 w-full bg-gray-100 sticky top-0 z-50">
-          <div 
-            className="h-full bg-blue-600 transition-all duration-300 ease-out"
-            style={{ width: `${progress}%` }}
-          />
+        {/* 상단 8개의 동그라미 인디케이터 */}
+        <div className="flex justify-center items-center gap-2 pt-6 pb-2 sticky top-0 z-50 bg-white/90 backdrop-blur-sm">
+          {Array.from({ length: totalSteps }).map((_, idx) => (
+            <div
+              key={idx}
+              className={`h-2 rounded-full transition-all duration-300 ease-out ${
+                currentStep === idx ? 'w-6 bg-blue-600' : 'w-2 bg-gray-200'
+              }`}
+            />
+          ))}
         </div>
 
-        <main className="flex-1 px-6 py-8 overflow-x-hidden">
+        {/* 본문 콘텐츠 */}
+        <main className="flex-1 px-6 py-6 overflow-x-hidden animate-in fade-in duration-300">
           {steps[currentStep]}
         </main>
-
-        <footer className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-between items-center z-50 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-          <button
-            onClick={handlePrev}
-            disabled={currentStep === 0}
-            className={`flex items-center gap-1 px-4 py-2 rounded-lg font-medium transition-colors ${
-              currentStep === 0 
-                ? 'text-gray-300 cursor-not-allowed' 
-                : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
-            }`}
-          >
-            <IconChevronLeft className="w-5 h-5" />
-            이전
-          </button>
-
-          {currentStep < totalSteps - 1 ? (
-            <button
-              onClick={handleNext}
-              className="flex items-center gap-1 px-5 py-2 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-sm"
-            >
-              다음
-              <IconChevronRight className="w-5 h-5" />
-            </button>
-          ) : (
-            <button
-              onClick={() => window.alert('수고하셨습니다! 풍성한 나눔 시간 되세요. 🙏')}
-              className="flex items-center gap-1 px-5 py-2 rounded-lg font-semibold text-white bg-gray-800 hover:bg-gray-900 transition-colors shadow-sm"
-            >
-              나눔 완료
-            </button>
-          )}
-        </footer>
 
       </div>
     </div>
