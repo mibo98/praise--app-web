@@ -107,7 +107,6 @@ const Step2_Intro = () => (
     <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 leading-snug">
       예배시의 음악사용과 문화에 대하여
     </h2>
-    <p className="text-gray-500 text-sm">원문 - 이정규 목사 (시광교회)</p>
     
     <p className="text-sm text-gray-700 leading-relaxed mt-4">
       교회 안에서 음악은 무척 예민한 문제야. 성도들이 쉽게 화를 내거나 상처 받기도 하거든. 스펄전 목사님은 그의 음악 사역을 ‘전쟁 부서’라고 불렀어. 미국의 기독교 작가 제임스 답슨(James Dobson)은 음악이 교회에 많은 분쟁을 가져왔다면서 이렇게 덧붙였어. 
