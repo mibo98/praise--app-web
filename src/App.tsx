@@ -9,27 +9,27 @@ const IconChevronLeft = ({ className }) => <svg xmlns="http://www.w3.org/2000/sv
 const IconChevronRight = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>;
 
 // --- Reusable UI Components ---
-const Blockquote = ({ text, author }) => (
+const Blockquote = ({ text, author }: { text: string; author?: string }) => (
   <div className="my-4 border-l-4 border-gray-400 bg-gray-50 p-4 rounded-r-lg shadow-sm">
     <p className="italic text-gray-700 leading-relaxed whitespace-pre-wrap">{text}</p>
     {author && <p className="mt-2 text-sm font-semibold text-gray-900 text-right">- {author}</p>}
   </div>
 );
 
-const Callout = ({ children, icon: Icon }) => (
+const Callout = ({ children, icon: Icon }: { children: React.ReactNode; icon?: React.ElementType }) => (
   <div className="flex gap-3 my-5 p-4 rounded-lg bg-blue-50 border border-blue-100 text-blue-900 shadow-sm">
     {Icon && <Icon className="w-6 h-6 text-blue-500 shrink-0" />}
     <div className="leading-relaxed font-medium whitespace-pre-wrap">{children}</div>
   </div>
 );
 
-const AccordionItem = ({ title, children, isOpen, onClick }) => (
+const AccordionItem = ({ title, children, isOpen, onClick }: { title: string; children: React.ReactNode; isOpen: boolean; onClick: () => void }) => (
   <div className="border border-gray-200 rounded-lg mb-3 overflow-hidden shadow-sm bg-white">
     <button
       className="w-full px-4 py-4 text-left flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors"
       onClick={onClick}
     >
-      <span className="font-semibold text-gray-800 pr-4">{title}</span>
+      <span className="font-semibold text-gray-800 pr-4 text-left">{title}</span>
       {isOpen ? (
         <IconChevronUp className="w-5 h-5 text-gray-500 shrink-0" />
       ) : (
