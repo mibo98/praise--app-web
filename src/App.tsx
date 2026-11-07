@@ -106,7 +106,6 @@ const Step2_Intro = () => (
     <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 leading-snug">
       예배시의 음악사용과 문화에 대하여
     </h2>
-    <p className="text-gray-500 text-sm">원문 - 이정규 목사 (시광교회)</p>
     
     <p className="text-gray-700 leading-relaxed mt-4">
       교회 안에서 음악은 무척 예민한 문제야. 성도들이 쉽게 화를 내거나 상처 받기도 하거든. 스펄전 목사님은 그의 음악 사역을 ‘전쟁 부서’라고 불렀어. 미국의 기독교 작가 제임스 답슨(James Dobson)은 음악이 교회에 많은 분쟁을 가져왔다면서 이렇게 덧붙였어. 
@@ -281,7 +280,7 @@ const Step7_Questions = () => {
   ];
 
   return (
-    <div className="space-y-5 pb-20">
+    <div className="space-y-5 pb-8">
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xl">📚</span>
         <h2 className="text-xl font-bold text-gray-900">나눔 질문</h2>
@@ -303,7 +302,7 @@ const Step7_Questions = () => {
         ))}
       </div>
       
-      <div className="pt-10 flex justify-center">
+      <div className="pt-8 flex justify-center">
         <button
           onClick={() => window.alert('수고하셨습니다! 풍성한 나눔 시간 되세요. 🙏')}
           className="flex items-center gap-1 px-6 py-3 rounded-xl font-semibold text-white bg-gray-800 hover:bg-gray-900 transition-colors shadow-lg"
@@ -365,18 +364,19 @@ function App() {
 
     let currentAxis = swipeAxis;
     
-    // 처음에 사용자가 상하로 스크롤하려는지, 좌우로 스와이프하려는지 파악
-    if (!currentAxis && (Math.abs(diffX) > 5 || Math.abs(diffY) > 5)) {
-      currentAxis = Math.abs(diffX) > Math.abs(diffY) ? 'x' : 'y';
+    // [수정 1] 스와이프 축 판단 기준 완화 및 상하 스크롤 우선 인식
+    // 움직임이 15px 이상 발생했을 때만 어느 방향인지(축) 확정합니다.
+    // 또한 상하(Y)로 움직인 거리가 좌우(X)로 움직인 거리의 70%만 넘어도 '세로 스크롤'로 찰떡같이 알아듣고 스와이프를 잠급니다.
+    if (!currentAxis && (Math.abs(diffX) > 15 || Math.abs(diffY) > 15)) {
+      currentAxis = Math.abs(diffY) > Math.abs(diffX) * 0.7 ? 'y' : 'x';
       setSwipeAxis(currentAxis);
     }
 
-    // 세로 스크롤 중이라면 좌우 애니메이션 무시
+    // 세로 스크롤(y축)로 판명 났으면, 좌우 화면 이동(스와이프) 로직은 완전히 무시합니다.
     if (currentAxis === 'y') return;
     
-    // 가로 스와이프 중이라면 실시간 위치 업데이트
+    // 가로 스와이프(x축)로 판명 났을 때만 화면을 좌우로 당깁니다.
     if (currentAxis === 'x') {
-      // 첫 페이지에서 더 왼쪽으로 밀거나, 끝 페이지에서 더 오른쪽으로 밀 때의 저항감(고무줄 효과)
       if ((currentStep === 0 && diffX > 0) || (currentStep === totalSteps - 1 && diffX < 0)) {
         setSwipeOffset(diffX * 0.25);
       } else {
@@ -389,7 +389,6 @@ function App() {
     setIsSwiping(false);
     
     if (swipeAxis === 'x') {
-      // 지정된 거리 이상 밀었으면 페이지 전환
       if (swipeOffset < -minSwipeDistance && currentStep < totalSteps - 1) {
         setCurrentStep(prev => prev + 1);
       } else if (swipeOffset > minSwipeDistance && currentStep > 0) {
@@ -397,7 +396,6 @@ function App() {
       }
     }
     
-    // 터치 종료 시 변수 초기화 (스르륵 제자리로 돌아감)
     setSwipeOffset(0);
     setTouchStart(null);
     setSwipeAxis(null);
@@ -405,10 +403,6 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center text-gray-900 font-sans">
-      {/* 
-        touch-pan-y 클래스: 스마트폰 브라우저의 기본 뒤로가기 스와이프는 막고, 
-        상하 스크롤만 부드럽게 허용해주는 핵심 설정!
-      */}
       <div 
         className="w-full max-w-md bg-white min-h-screen shadow-2xl flex flex-col relative overflow-hidden touch-pan-y"
         onTouchStart={onTouchStartEvent}
@@ -434,8 +428,6 @@ function App() {
             className="flex w-full h-full"
             style={{
               transform: `translateX(calc(-${currentStep * 100}% + ${swipeOffset}px))`,
-              // 터치 중(isSwiping)일 때는 애니메이션을 꺼서 손가락을 1:1로 따라가고, 
-              // 손을 떼면 부드럽게(cubic-bezier) 제자리나 다음 페이지로 튕기듯 들어가는 원리
               transition: isSwiping ? 'none' : 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)'
             }}
           >
@@ -443,7 +435,8 @@ function App() {
               <div 
                 key={idx} 
                 id={`step-container-${idx}`}
-                className="w-full h-full flex-shrink-0 overflow-y-auto px-6 py-4 pb-24"
+                // [수정 2] 불필요하게 깊었던 하단 여백(pb-24)을 pb-8로 깔끔하게 줄였습니다.
+                className="w-full h-full flex-shrink-0 overflow-y-auto px-6 py-4 pb-8"
               >
                 {step}
               </div>
