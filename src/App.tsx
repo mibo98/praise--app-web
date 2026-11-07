@@ -313,14 +313,6 @@ const Step7_Questions = () => {
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
 
-  useEffect(() => {
-    if (!document.getElementById('tailwind-cdn')) {
-      const script = document.createElement('script');
-      script.id = 'tailwind-cdn';
-      script.src = 'https://cdn.tailwindcss.com';
-      document.head.appendChild(script);
-    }
-  }, []);
 
   const steps = [
     <Step0_Title />,
