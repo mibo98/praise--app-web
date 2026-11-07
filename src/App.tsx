@@ -9,23 +9,22 @@ const IconChevronUp = ({ className }: { className?: string }) => <svg xmlns="htt
 // --- Reusable UI Components ---
 const Blockquote = ({ text, author }: { text: string; author?: string }) => (
   <div className="my-4 border-l-4 border-gray-400 bg-gray-50 p-4 rounded-r-lg shadow-sm">
-    {/* 인용구는 작아지지 않도록 text-base 명시 */}
     <p className="italic text-base text-gray-700 leading-relaxed whitespace-pre-wrap">{text}</p>
     {author && <p className="mt-2 text-sm font-semibold text-gray-900 text-right">- {author}</p>}
   </div>
 );
 
 const Callout = ({ children, icon: Icon }: { children: React.ReactNode; icon?: React.ElementType }) => (
-  <div className="flex gap-3 my-5 p-4 rounded-lg bg-blue-50 border border-blue-100 text-blue-900 shadow-sm">
+  <div className="flex gap-3 my-5 p-4 rounded-lg bg-white/80 border border-blue-200 text-blue-900 shadow-sm backdrop-blur-sm">
     {Icon && <Icon className="w-6 h-6 text-blue-500 shrink-0" />}
     <div className="leading-relaxed text-sm font-medium whitespace-pre-wrap">{children}</div>
   </div>
 );
 
 const AccordionItem = ({ title, children, isOpen, onClick }: { title: string; children: React.ReactNode; isOpen: boolean; onClick: () => void }) => (
-  <div className="border border-gray-200 rounded-lg mb-3 overflow-hidden shadow-sm bg-white">
+  <div className="border border-gray-200 rounded-lg mb-3 overflow-hidden shadow-sm bg-white/90 backdrop-blur-sm">
     <button
-      className="w-full px-4 py-4 text-left flex justify-between items-center bg-gray-50 hover:bg-gray-100 transition-colors"
+      className="w-full px-4 py-4 text-left flex justify-between items-center bg-transparent hover:bg-gray-50/50 transition-colors"
       onClick={onClick}
     >
       <span className="font-semibold text-gray-800 pr-4 text-left">{title}</span>
@@ -36,7 +35,7 @@ const AccordionItem = ({ title, children, isOpen, onClick }: { title: string; ch
       )}
     </button>
     {isOpen && (
-      <div className="p-4 text-sm text-gray-700 leading-relaxed bg-white border-t border-gray-100 animate-in slide-in-from-top-2 duration-200">
+      <div className="p-4 text-sm text-gray-700 leading-relaxed bg-white/50 border-t border-gray-100 animate-in slide-in-from-top-2 duration-200">
         <ul className="list-disc pl-5 space-y-2">{children}</ul>
       </div>
     )}
@@ -66,7 +65,7 @@ const Step1_IceBreaking = () => (
       <h2 className="text-xl font-bold text-gray-900">Ice Breaking</h2>
     </div>
     
-    <hr className="border-gray-200 my-2" />
+    <hr className="border-blue-200/50 my-2" />
 
     <div className="w-full aspect-[9/16] max-h-[60vh] rounded-lg overflow-hidden shadow-sm mx-auto flex justify-center bg-black">
       <iframe 
@@ -81,7 +80,7 @@ const Step1_IceBreaking = () => (
       ></iframe>
     </div>
 
-    <div className="bg-gray-100 p-4 rounded-lg text-sm text-gray-700 leading-relaxed font-mono whitespace-pre-wrap">
+    <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg text-sm text-gray-700 leading-relaxed font-mono whitespace-pre-wrap shadow-sm">
       {`그대 폭풍 속을 걷고 있을 때\n비바람을 마주해야 할 때\n불빛조차 보이지 않아도\n그대 혼자 걷지 않을 거예요\n두려움 앞에서 하늘을 보아요\n외로운 그대여 걱정 마요\n꿈꾸는 그 길을 또 걷고 걸어요\n그대 혼자 걷지 않을 거예요\n\n- *혼자 걷지 않을거에요 中*`}
     </div>
 
@@ -107,6 +106,7 @@ const Step2_Intro = () => (
     <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 leading-snug">
       예배시의 음악사용과 문화에 대하여
     </h2>
+    <p className="text-gray-500 text-sm">원문 - 이정규 목사 (시광교회)</p>
     
     <p className="text-sm text-gray-700 leading-relaxed mt-4">
       교회 안에서 음악은 무척 예민한 문제야. 성도들이 쉽게 화를 내거나 상처 받기도 하거든. 스펄전 목사님은 그의 음악 사역을 ‘전쟁 부서’라고 불렀어. 미국의 기독교 작가 제임스 답슨(James Dobson)은 음악이 교회에 많은 분쟁을 가져왔다면서 이렇게 덧붙였어. 
@@ -283,10 +283,10 @@ const Step7_Questions = () => {
   return (
     <div className="space-y-5 pb-8">
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-xl">📚</span>
+        <span className="text-xl">🌿</span>
         <h2 className="text-xl font-bold text-gray-900">나눔 질문</h2>
       </div>
-      <hr className="border-gray-200 my-2 mb-6" />
+      <hr className="border-green-200/50 my-2 mb-6" />
       
       <div>
         {questions.map((q, idx) => (
@@ -306,7 +306,7 @@ const Step7_Questions = () => {
       <div className="pt-8 flex justify-center">
         <button
           onClick={() => window.alert('수고하셨습니다! 풍성한 나눔 시간 되세요. 🙏')}
-          className="flex items-center gap-1 px-6 py-3 rounded-xl font-semibold text-white bg-gray-800 hover:bg-gray-900 transition-colors shadow-lg"
+          className="flex items-center gap-1 px-6 py-3 rounded-xl font-semibold text-white bg-green-700 hover:bg-green-800 transition-colors shadow-lg"
         >
           나눔 완료하기
         </button>
@@ -396,26 +396,34 @@ function App() {
     setSwipeAxis(null);
   };
 
+  // 현재 스텝에 따른 폰 배경색 지정 함수
+  const getBgColor = (step: number) => {
+    if (step === 1) return 'bg-blue-50';   // Ice Breaking: 연한 하늘색
+    if (step === 7) return 'bg-green-50';  // 나눔 질문: 연한 초록색
+    return 'bg-white';                     // 나머지 본문: 흰색
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 flex justify-center text-gray-900 font-sans">
       {/* 
-        [수정 3] min-h-screen 대신 h-[100dvh]를 사용하여 
-        안쪽 컨텐츠 높이가 바깥 컨테이너를 억지로 늘리지 못하게 완벽하게 차단합니다!
+        배경색 변경 및 전환 애니메이션 적용 (transition-colors duration-700) 
       */}
       <div 
-        className="w-full max-w-md bg-white h-[100dvh] shadow-2xl flex flex-col relative overflow-hidden touch-pan-y"
+        className={`w-full max-w-md h-[100dvh] shadow-2xl flex flex-col relative overflow-hidden touch-pan-y transition-colors duration-700 ease-in-out ${getBgColor(currentStep)}`}
         onTouchStart={onTouchStartEvent}
         onTouchMove={onTouchMoveEvent}
         onTouchEnd={onTouchEndEvent}
       >
         
-        {/* 상단 8개의 동그라미 인디케이터 */}
-        <div className="flex justify-center items-center gap-2 pt-6 pb-4 sticky top-0 z-50 bg-white/90 backdrop-blur-sm">
+        {/* 상단 8개의 동그라미 인디케이터 (색상과 어울리도록 배경색 투명화) */}
+        <div className="flex justify-center items-center gap-2 pt-6 pb-4 z-50">
           {Array.from({ length: totalSteps }).map((_, idx) => (
             <div
               key={idx}
               className={`h-2 rounded-full transition-all duration-300 ease-out ${
-                currentStep === idx ? 'w-6 bg-blue-600' : 'w-2 bg-gray-200'
+                currentStep === idx 
+                  ? (currentStep === 7 ? 'w-6 bg-green-600' : 'w-6 bg-blue-600') 
+                  : 'w-2 bg-gray-300'
               }`}
             />
           ))}
@@ -434,7 +442,6 @@ function App() {
               <div 
                 key={idx} 
                 id={`step-container-${idx}`}
-                // [수정 1] pt-8을 추가하여 상단 인디케이터와 본문 텍스트 사이의 여백을 넉넉하게 띄웠습니다.
                 className="w-full h-full flex-shrink-0 overflow-y-auto px-6 pt-8 pb-8"
               >
                 {step}
