@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 // --- 무설치 자체 아이콘 (lucide-react 대체) ---
-const IconMessageCircle = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>;
-const IconChevronDown = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m6 9 6 6 6-6"/></svg>;
-const IconChevronUp = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m18 15-6-6-6 6"/></svg>;
-const IconChevronLeft = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15 18-6-6 6-6"/></svg>;
-const IconChevronRight = ({ className }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>;
+const IconMessageCircle = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></svg>;
+const IconChevronDown = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m6 9 6 6 6-6"/></svg>;
+const IconChevronUp = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m18 15-6-6-6 6"/></svg>;
+const IconChevronLeft = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15 18-6-6 6-6"/></svg>;
+const IconChevronRight = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6"/></svg>;
 
 // --- Reusable UI Components ---
 const Blockquote = ({ text, author }: { text: string; author?: string }) => (
@@ -137,7 +137,7 @@ const Step3_TwoViews = () => (
       <ul className="list-disc pl-5 space-y-2 text-gray-700 leading-relaxed">
         <li><strong>과거와의 단절:</strong> 옛 찬양을 피하다 보니 신앙의 선배들과 멀어지게 돼.</li>
         <li><strong>빈약한 가사:</strong> 찬송가들은 교리를 깊이 있게 풀어내는 경향이 있어. 그래서 가사가 보통 3~5절까지 이르지. 그러나 요즘 곡들은 ‘대체로’ 가사가 짧고 반복적이야. 새신자들이 노래를 통해 기독교 교리를 배울 기회를 앗아갈 수도 있어.</li>
-        <li><strong>금방 뒤쳐짐:</strong> 유행하는 음악을 차용하면 금방 흘러간 옛 노래가 되어 버려. 밴드 사운드의 CCM이 어떤 세대(86, X세대)에겐 '젊은 음악'이지만, 요즘 Z세대들에겐 '부모님 세대의 옛날 음악'일 뿐이야.</li>
+        <li><strong>금방 뒤쳐짐:</strong> 유행하는 음악을 차용하면 금방 흘러간 옛 노래가 되어 버려. 밴드 사운드의 CCM이 어떤 세대(86, X세대)에겐 '젊은 음악'이지만, 요즘 Z세대들에겐 '부모 세대의 옛날 음악'일 뿐이야.</li>
       </ul>
     </div>
 
@@ -251,9 +251,9 @@ const Step6_Cross = () => (
 );
 
 const Step7_Questions = () => {
-  const [openIndex, setOpenIndex] = useState(0);
+  const [openIndex, setOpenIndex] = useState<number>(0);
 
-  const toggleAccordion = (index) => {
+  const toggleAccordion = (index: number) => {
     setOpenIndex(openIndex === index ? -1 : index);
   };
 
@@ -312,7 +312,6 @@ const Step7_Questions = () => {
 
 function App() {
   const [currentStep, setCurrentStep] = useState(0);
-
 
   const steps = [
     <Step0_Title />,
